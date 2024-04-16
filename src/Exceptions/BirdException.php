@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Integrations\Bird\Exceptions;
+namespace Foodticket\LaravelBirdDriver\Exceptions;
 
 use Exception;
 

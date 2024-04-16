@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Integrations\Bird\Transport;
+declare(strict_types=1);
 
-use App\Integrations\Bird\Contracts\BirdClientInterface;
-use App\Integrations\Bird\Dto\PresignedUploadResponse;
-use App\Integrations\Bird\Exceptions\BirdException;
-use Aws\S3\Exception\S3Exception;
+namespace Foodticket\LaravelBirdDriver\Transport;
+
+use Foodticket\LaravelBirdDriver\Contracts\BirdClientInterface;
+use Foodticket\LaravelBirdDriver\Dto\PresignedUploadResponse;
+use Foodticket\LaravelBirdDriver\Exceptions\BirdException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
@@ -16,7 +17,6 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\MessageConverter;
 use Symfony\Component\Mime\Part\DataPart;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * https://docs.bird.com/api/channels-api/supported-channels/programmable-email/sending-messages
@@ -147,7 +147,7 @@ class BirdMailTransport extends AbstractTransport implements Stringable
         return null;
     }
 
-     /**
+    /**
      * @return ?string[]
      */
     private function getFrom(Email $email): ?array
@@ -176,16 +176,16 @@ class BirdMailTransport extends AbstractTransport implements Stringable
             try {
                 $presignedUploadResponse = $this->prepareUploadAttachment($attachment);
                 $result = $this->uploadAttachment($attachment, $presignedUploadResponse);
-            } catch (TransportExceptionInterface $e) {
+            } catch (Exception $e) {
                 // presigned upload request failed
-            } catch (S3Exception $e) {
+            } catch (Exception $e) {
                 // do something with presignedUploadResponse
             }
 
-            if (!$result->noContent()) {
+            if (! $result->noContent()) {
                 // do something with presignedUploadResponse?
                 continue;
-            };
+            }
 
             $attachments->add([
                 'mediaUrl' => $presignedUploadResponse->mediaUrl,
@@ -211,7 +211,7 @@ class BirdMailTransport extends AbstractTransport implements Stringable
         foreach ($presignedUploadResponse->uploadFormData->toArray() as $name => $contents) {
             $formParams->add([
                 'name' => $name,
-                'contents' => $contents
+                'contents' => $contents,
             ]);
         }
 

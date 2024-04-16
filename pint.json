@@ -1,0 +1,4 @@
+{
+    "preset": "psr12",
+    "comment_type": ["phpdocs_like"]
+}

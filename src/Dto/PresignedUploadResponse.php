@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Integrations\Bird\Dto;
+namespace Foodticket\LaravelBirdDriver\Dto;
 
 use Spatie\LaravelData\Data;
 
