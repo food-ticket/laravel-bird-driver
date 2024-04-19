@@ -2,7 +2,7 @@
 
 return [
     'base_url' => env('BIRD_API_BASE_URL', 'https://api.bird.com'),
-    'access_key' => env('BIRD_API_ACCESS_KEY', null),
-    'workspace_id' => env('BIRD_API_WORKSPACE_ID', null),
-    'channel_id' => env('BIRD_API_CHANNEL_ID', null),
+    'access_key' => env('BIRD_API_ACCESS_KEY'),
+    'workspace_id' => env('BIRD_API_WORKSPACE_ID'),
+    'channel_id' => env('BIRD_API_CHANNEL_ID'),
 ];

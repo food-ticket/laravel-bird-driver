@@ -8,6 +8,5 @@ class MailServiceProvider extends \Illuminate\Mail\MailServiceProvider
         parent::register();
 
         $this->app->register(BirdServiceProvider::class);
-
     }
 }

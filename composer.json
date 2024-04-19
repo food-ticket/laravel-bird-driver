@@ -16,5 +16,23 @@
         "phpunit/phpunit": "^9.5.8||^10.0",
         "laravel/helpers": "^1.2",
         "vlucas/phpdotenv": "^5.4.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Foodticket\\LaravelBirdDriver\\": "src"
+        }
+    },
+    "authors": [
+        {
+            "name": "Foodticket",
+            "email": "developer@foodticket.nl"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Foodticket\\LaravelBirdDriver\\BirdServiceProvider"
+            ]
+        }
     }
 }
