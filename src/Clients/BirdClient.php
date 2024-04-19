@@ -9,11 +9,16 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
-class BirdClient extends PendingRequest implements BirdClientInterface
+class BirdClient implements BirdClientInterface
 {
+    protected PendingRequest $client;
+
+    /**
+     * @param string[] $config
+     */
     public function __construct(array $config)
     {
-        $this->client = Http::withHeaders(['Authorization' => 'Bearer '.$config['access_key']])
+        $this->client = Http::withHeaders(['Authorization' => 'Bearer ' . $config['access_key']])
             ->bodyFormat('json')
             ->baseUrl(
                 sprintf(
@@ -27,11 +32,11 @@ class BirdClient extends PendingRequest implements BirdClientInterface
 
     public function createPresignedUploadUrl(string $contentType): Response
     {
-        return $this->post('presigned-upload', ['contentType' => $contentType]);
+        return $this->client->post('presigned-upload', ['contentType' => $contentType]);
     }
 
     public function sendMail(array $payload): Response
     {
-        return $this->post('messages', $payload);
+        return $this->client->post('messages', $payload);
     }
 }

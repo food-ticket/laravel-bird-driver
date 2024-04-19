@@ -6,7 +6,7 @@ namespace Foodticket\LaravelBirdDriver\Exceptions;
 
 use RuntimeException;
 
-class UploadFailedException extends RuntimeException
+class AttachmentUploadFailedException extends RuntimeException
 {
     protected $message = 'Upload of attachment to S3 bucket has failed.';
 }

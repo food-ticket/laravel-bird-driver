@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Foodticket\LaravelBirdDriver\Transport;
 
+use Exception;
 use Foodticket\LaravelBirdDriver\Contracts\BirdClientInterface;
 use Foodticket\LaravelBirdDriver\Dto\PresignedUploadResponse;
-use Foodticket\LaravelBirdDriver\Exceptions\BirdException;
+use Foodticket\LaravelBirdDriver\Exceptions\AttachmentUploadFailedException;
+use Foodticket\LaravelBirdDriver\Exceptions\BirdClientException;
+use Foodticket\LaravelBirdDriver\Exceptions\BirdMailNotSentException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
+use Psr\Http\Client\ClientExceptionInterface;
 use Stringable;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
@@ -23,17 +27,18 @@ use Symfony\Component\Mime\Part\DataPart;
  */
 class BirdMailTransport extends AbstractTransport implements Stringable
 {
-    private BirdClientInterface $client;
-    private PendingRequest $uploader;
-
-    public function __construct(BirdClientInterface $client, PendingRequest $uploader)
+    public function __construct(private BirdClientInterface $client, private PendingRequest $uploader)
     {
+        parent::__construct();
+
         $this->client = $client;
         $this->uploader = $uploader;
 
-        parent::__construct();
     }
 
+    /**
+     * @throws BirdMailNotSentException
+     */
     protected function doSend(SentMessage $message): void
     {
         $email = MessageConverter::toEmail($message->getOriginalMessage());
@@ -49,33 +54,33 @@ class BirdMailTransport extends AbstractTransport implements Stringable
         }
 
         if ($metadata = $this->getMetadata($email)) {
-            $data['body']['html']['metadata'] = $metadata;
+            $data['body']['html'] = ['metadata' => $metadata];
         }
 
         $attachments = $this->uploadAttachments($email);
-        if ($attachments->isEmpty() === false) {
+        if ($attachments->isNotEmpty()) {
             $data['body']['html']['attachments'] = $attachments;
         }
 
-        $response = $this->client->sendMail($data);
-        // what to do with the response?
-        // do we store all responses?
-        // what do we do with emails where attachments failed to upload
-        // uploadAttachment() is actually an S3 bucket upload, maybe use S3Client
+        try {
+            $response = $this->client->sendMail($data);
+        } catch (Exception $exception) {
+            throw new BirdMailNotSentException($exception->getMessage());
+        }
+
+        if ($response->successful() === false) {
+            throw new BirdMailNotSentException();
+        }
     }
 
     private function getReceivers(Email $email): Collection
     {
-        $contacts = collect();
-        foreach ($email->getTo() as $address) {
-            $contact = $this->getContact($address);
-
-            $contacts->push($contact);
-        }
-
-        return $contacts;
+        return collect($email->getTo())->map(fn (Address $address) => $this->getContact($address));
     }
 
+    /**
+     * @return string[]
+     */
     private function getContact(Address $address): array
     {
         return [
@@ -85,6 +90,7 @@ class BirdMailTransport extends AbstractTransport implements Stringable
     }
 
     /**
+     * @throws BirdMailNotSentException
      * @return string[]
      */
     private function getBody(Email $email): array
@@ -106,7 +112,7 @@ class BirdMailTransport extends AbstractTransport implements Stringable
         }
 
         if (empty($contents)) {
-            throw new BirdException('Email body is empty. Email has not been sent.');
+            throw new BirdMailNotSentException('Email body is empty.');
         }
 
         return $contents;
@@ -152,39 +158,30 @@ class BirdMailTransport extends AbstractTransport implements Stringable
      */
     private function getFrom(Email $email): ?array
     {
-        if (count($email->getFrom()) > 0) {
-            $from = $email->getFrom()[0];
-
-            $fromData = [
-                'username' => $from->getAddress(),
-            ];
-
-            if ($fromData) {
-                $fromData['displayName'] = $from->getName();
-            }
-
-            return $fromData;
+        if (count($email->getFrom()) === 0) {
+            return null;
         }
 
-        return null;
+        $from = $email->getFrom()[0];
+
+        return [
+            'displayName' => $from->getName(),
+            'username' => $from->getAddress(),
+        ];
     }
 
+    /**
+     * @throws AttachmentUploadFailedException
+     */
     private function uploadAttachments(Email $email): Collection
     {
         $attachments = collect();
         foreach ($email->getAttachments() as $attachment) {
-            try {
-                $presignedUploadResponse = $this->prepareUploadAttachment($attachment);
-                $result = $this->uploadAttachment($attachment, $presignedUploadResponse);
-            } catch (Exception $e) {
-                // presigned upload request failed
-            } catch (Exception $e) {
-                // do something with presignedUploadResponse
-            }
+            $presignedUploadResponse = $this->prepareUploadAttachment($attachment);
+            $result = $this->uploadAttachment($attachment, $presignedUploadResponse);
 
             if (! $result->noContent()) {
-                // do something with presignedUploadResponse?
-                continue;
+                throw new AttachmentUploadFailedException();
             }
 
             $attachments->add([
@@ -197,13 +194,28 @@ class BirdMailTransport extends AbstractTransport implements Stringable
         return $attachments;
     }
 
-    private function prepareUploadAttachment(DataPart $attachment): ?PresignedUploadResponse
+    /**
+     * @throws BirdClientException
+     * @throws AttachmentUploadFailedException
+     */
+    private function prepareUploadAttachment(DataPart $attachment): PresignedUploadResponse
     {
-        $response = $this->client->createPresignedUploadUrl($this->getAttachmentContentType($attachment));
+        try {
+            $response = $this->client->createPresignedUploadUrl($this->getAttachmentContentType($attachment));
+        } catch (ClientExceptionInterface $exception) {
+            throw new BirdClientException($exception->getMessage());
+        }
+
+        if ($response->successful() === false) {
+            throw new AttachmentUploadFailedException();
+        }
 
         return PresignedUploadResponse::from($response->body());
     }
 
+    /**
+     * @throws BirdClientException
+     */
     private function uploadAttachment(DataPart $attachment, PresignedUploadResponse $presignedUploadResponse): Response
     {
         $headers = collect(['Content-Type' => $presignedUploadResponse->uploadFormData->contentType]);
@@ -222,10 +234,16 @@ class BirdMailTransport extends AbstractTransport implements Stringable
             'headers' => $headers->all(),
         ]);
 
-        return $this->uploader->post(
-            $presignedUploadResponse->uploadUrl,
-            $formParams->all(),
-        );
+        try {
+            $response = $this->uploader->post(
+                $presignedUploadResponse->uploadUrl,
+                $formParams->all(),
+            );
+        } catch (ClientExceptionInterface $exception) {
+            throw new BirdClientException($exception->getMessage());
+        }
+
+        return $response;
     }
 
     private function getAttachmentName(DataPart $dataPart): string
