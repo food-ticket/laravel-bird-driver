@@ -4,3 +4,8 @@ parameters:
 			message: "#^Parameter \\#1 \\$message of static method Symfony\\\\Component\\\\Mime\\\\MessageConverter\\:\\:toEmail\\(\\) expects Symfony\\\\Component\\\\Mime\\\\Message, Symfony\\\\Component\\\\Mime\\\\RawMessage given\\.$#"
 			count: 1
 			path: src/Transport/BirdMailTransport.php
+
+		-
+			message: "#^Call to an undefined method Foodticket\\\\LaravelBirdDriver\\\\Contracts\\\\BirdClientInterface\\:\\:shouldReceive\\(\\)\\.$#"
+			count: 1
+			path: tests/Transport/BirdMailTransportTest.php
