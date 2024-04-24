@@ -32,8 +32,12 @@
     },
     "authors": [
         {
-            "name": "Foodticket",
-            "email": "developer@foodticket.nl"
+            "name": "Rik Morskate",
+            "email": "rik@foodticket.nl"
+        },
+        {
+            "name": "Dylan G",
+            "email": "dylan@foodticket.nl"
         }
     ],
     "extra": {
