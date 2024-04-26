@@ -2,7 +2,7 @@
     "name": "foodticket/laravel-bird-driver",
     "description": "Bird mail driver for Laravel 9+",
     "keywords": ["PHP", "Bird", "mail driver", "Laravel mail driver"],
-    "version": "1.0.0-beta.3",
+    "version": "1.0.0-beta.4",
     "type": "library",
     "license": "MIT",
     "require": {
