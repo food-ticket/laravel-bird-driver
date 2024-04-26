@@ -54,7 +54,7 @@ class BirdMailTransport extends AbstractTransport implements Stringable
         }
 
         if ($metadata = $this->getMetadata($email)) {
-            $data['body']['html'] = ['metadata' => $metadata];
+            $data['body']['html']['metadata'] = $metadata;
         }
 
         $attachments = $this->uploadAttachments($email);
