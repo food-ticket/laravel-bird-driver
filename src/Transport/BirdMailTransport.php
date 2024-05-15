@@ -13,6 +13,7 @@ use Foodticket\LaravelBirdDriver\Exceptions\BirdMailNotSentException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Psr\Http\Client\ClientExceptionInterface;
 use Stringable;
 use Symfony\Component\Mailer\SentMessage;
@@ -91,7 +92,7 @@ class BirdMailTransport extends AbstractTransport implements Stringable
 
     /**
      * @throws BirdMailNotSentException
-     * @return string[]
+     * @return array<string, string[]|string>
      */
     private function getBody(Email $email): array
     {
@@ -166,7 +167,7 @@ class BirdMailTransport extends AbstractTransport implements Stringable
 
         return [
             'displayName' => $from->getName(),
-            'username' => $from->getAddress(),
+            'username' => Str::of($from->getAddress())->before('@'),
         ];
     }
 

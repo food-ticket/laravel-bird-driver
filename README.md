@@ -10,7 +10,7 @@ Please make it [Here](https://app.bird.com/settings/access-keys).
 
 ### Compatibility
 
-| Laravel   | laravel-sendgrid-driver |
+| Laravel   | laravel-bird-driver |
 |-----------| ---- |
 | 9, 10, 11 | ^4.0 |
 
