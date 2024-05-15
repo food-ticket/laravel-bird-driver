@@ -91,7 +91,7 @@ class BirdMailTransport extends AbstractTransport implements Stringable
 
     /**
      * @throws BirdMailNotSentException
-     * @return string[]
+     * @return array<string, string[]|string>
      */
     private function getBody(Email $email): array
     {
@@ -166,7 +166,7 @@ class BirdMailTransport extends AbstractTransport implements Stringable
 
         return [
             'displayName' => $from->getName(),
-            'username' => $from->getAddress(),
+            'username' => collect(explode('@', $from->getAddress()))->first(),
         ];
     }
 
