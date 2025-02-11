@@ -3,7 +3,7 @@
     "description": "Bird mail driver for Laravel 9+",
     "keywords": ["PHP", "Bird", "mail driver", "Laravel mail driver"],
     "type": "library",
-    "license": "MIT",
+    "license": "GPL-3.0-only",
     "require": {
         "php": "^8.1",
         "spatie/laravel-data": "^3.10||^4.7",
@@ -31,12 +31,16 @@
     },
     "authors": [
         {
-            "name": "Rik Morskate",
-            "email": "rik@foodticket.nl"
+            "name": "Rik",
+            "email": "rik@foodticket.nl",
+            "homepage": "https://foodticket.nl",
+            "role": "Developer"
         },
         {
             "name": "Dylan G",
-            "email": "dylan@foodticket.nl"
+            "email": "dylan@foodticket.nl",
+            "homepage": "https://foodticket.nl",
+            "role": "Developer"
         }
     ],
     "extra": {
