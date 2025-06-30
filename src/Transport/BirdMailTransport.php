@@ -70,7 +70,7 @@ class BirdMailTransport extends AbstractTransport implements Stringable
         }
 
         if ($response->successful() === false) {
-            throw new BirdMailNotSentException();
+            throw new BirdMailNotSentException($response->body());
         }
     }
 
