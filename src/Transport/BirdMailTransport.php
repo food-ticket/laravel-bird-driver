@@ -69,8 +69,8 @@ class BirdMailTransport extends AbstractTransport implements Stringable
             throw new BirdMailNotSentException($exception->getMessage());
         }
 
-        if ($response->successful() === false) {
-            throw new BirdMailNotSentException();
+        if ($response->failed()) {
+            $response->throw();
         }
     }
 
@@ -207,8 +207,8 @@ class BirdMailTransport extends AbstractTransport implements Stringable
             throw new BirdClientException($exception->getMessage());
         }
 
-        if ($response->successful() === false) {
-            throw new AttachmentUploadFailedException();
+        if ($response->failed()) {
+            $response->throw();
         }
 
         return PresignedUploadResponse::from($response->body());
