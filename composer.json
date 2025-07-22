@@ -3,7 +3,7 @@
     "description": "Bird mail driver for Laravel 9+",
     "keywords": ["PHP", "Bird", "mail driver", "Laravel mail driver"],
     "type": "library",
-    "license": "GPL-3.0-only",
+    "license": "MIT",
     "require": {
         "php": "^8.1",
         "spatie/laravel-data": "^3.10||^4.7",
