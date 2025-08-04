@@ -13,6 +13,7 @@ use Foodticket\LaravelBirdDriver\Exceptions\BirdMailNotSentException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Psr\Http\Client\ClientExceptionInterface;
 use Stringable;
@@ -66,10 +67,14 @@ class BirdMailTransport extends AbstractTransport implements Stringable
         try {
             $response = $this->client->sendMail($data);
         } catch (Exception $exception) {
+            Log::alert($exception->getMessage());
+
             throw new BirdMailNotSentException($exception->getMessage());
         }
 
         if ($response->failed()) {
+            Log::alert($response->json());
+
             $response->throw();
         }
     }
