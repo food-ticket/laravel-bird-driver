@@ -7,18 +7,14 @@
     "require": {
         "php": "^8.1",
         "spatie/laravel-data": "^3.10||^4.7",
-        "illuminate/mail": "^9.0||^10.0||^11.0||^12.0",
-        "illuminate/notifications": "^9.0||^10.0||^11.0||^12.0",
-        "illuminate/support": "^9.0||^10.0||^11.0||^12.0",
+        "laravel/framework": "^9.0||^10.0||^11.0||^12.0",
         "guzzlehttp/guzzle": "^7.2"
     },
     "require-dev": {
-        "illuminate/container": "^9.0||^10.0||^11.0||^12.0",
-        "illuminate/filesystem": "^9.0||^10.0||^11.0||^12.0",
         "larastan/larastan": "^2.9",
         "laravel/pint": "^1.15",
         "mockery/mockery": "^1.6",
-        "phpunit/phpunit": "^9||^10||^11",
+        "phpunit/phpunit": "^9||^10||^11||^12",
         "laravel/helpers": "^1.2",
         "vlucas/phpdotenv": "^5.4.1",
         "fakerphp/faker": "^1.23",
