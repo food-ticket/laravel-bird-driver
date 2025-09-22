@@ -10,9 +10,9 @@ Please make it [Here](https://app.bird.com/settings/access-keys).
 
 ### Compatibility
 
-| Laravel   | laravel-bird-driver |
-|-----------| ---- |
-| 9, 10, 11 | ^4.0 |
+| Laravel       | laravel-bird-driver |
+|---------------| ---- |
+| 9, 10, 11, 12 | ^4.0 |
 
 # Install (for [Laravel](https://laravel.com/))
 
